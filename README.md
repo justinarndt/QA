@@ -11,36 +11,20 @@
 ## 📐 Architecture
 
 ```mermaid
-graph TD
-    subgraph TESTS["🧪 Test Suites"]
-        T1["HybridWorkflowTest"]
-        T2["RBACSecurityTest"]
-        T3["BillingDataDrivenTest"]
-        T4["BiDiChaosTest"]
+graph LR
+    subgraph TESTS["Test Suites"]
+        T1["Hybrid Workflow"] ~~~ T2["RBAC Security"]
+        T3["Billing DDT"] ~~~ T4["BiDi Chaos"]
     end
-
-    subgraph PAGES["📄 Page Objects — Fluent API"]
-        P1["LoginPage"]
-        P2["DashboardPage"]
-        P3["SchedulerPage"]
-        P4["BillingPage"]
-        P5["PatientNotesPage"]
+    subgraph PAGES["Page Objects"]
+        P1["Login · Dashboard"] ~~~ P2["Scheduler · Billing · Notes"]
     end
-
-    subgraph CORE["⚙️ Framework Core"]
-        C1["BaseTest\nThreadLocal + BiDi"]
-        C2["ConfigManager"]
-        C3["ApiClient\nRestAssured"]
-        C4["RetryAnalyzer"]
+    subgraph CORE["Framework Core"]
+        C1["BaseTest · ConfigManager"] ~~~ C2["ApiClient · RetryAnalyzer"]
     end
-
-    subgraph INFRA["🏗️ Infrastructure"]
-        I1["GitHub Actions CI/CD"]
-        I2["Allure Reporting"]
-        I3["Parallel Execution"]
-        I4["Data-Driven Engine"]
+    subgraph INFRA["Infrastructure"]
+        I1["GitHub Actions · Allure"] ~~~ I2["Parallel · Data-Driven"]
     end
-
     TESTS --> PAGES --> CORE --> INFRA
 ```
 
