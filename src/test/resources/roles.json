@@ -1,0 +1,57 @@
+[
+  {
+    "role": "Doctor",
+    "email": "doctor@clinic.com",
+    "password": "SecurePass123",
+    "permissions": {
+      "scheduler": true,
+      "billing": true,
+      "clinicalNotes": true,
+      "patients": true
+    }
+  },
+  {
+    "role": "BillingClerk",
+    "email": "billing@clinic.com",
+    "password": "SecurePass123",
+    "permissions": {
+      "scheduler": true,
+      "billing": true,
+      "clinicalNotes": false,
+      "patients": true
+    }
+  },
+  {
+    "role": "Intern",
+    "email": "intern@clinic.com",
+    "password": "SecurePass123",
+    "permissions": {
+      "scheduler": true,
+      "billing": false,
+      "clinicalNotes": false,
+      "patients": true
+    }
+  },
+  {
+    "role": "FrontDesk",
+    "email": "frontdesk@clinic.com",
+    "password": "SecurePass123",
+    "permissions": {
+      "scheduler": true,
+      "billing": false,
+      "clinicalNotes": false,
+      "patients": false
+    }
+  },
+  {
+    "role": "Admin",
+    "email": "admin@clinic.com",
+    "password": "SecurePass123",
+    "permissions": {
+      "scheduler": true,
+      "billing": true,
+      "clinicalNotes": true,
+      "patients": true
+    }
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "scenario": "StandardCopayOnly",
+    "copay": 25.00,
+    "deductible": 0.00,
+    "coinsurancePercent": 80,
+    "serviceCost": 150.00
+  },
+  {
+    "scenario": "HighDeductiblePlan",
+    "copay": 0.00,
+    "deductible": 500.00,
+    "coinsurancePercent": 70,
+    "serviceCost": 300.00
+  },
+  {
+    "scenario": "FullCoverageSession",
+    "copay": 0.00,
+    "deductible": 0.00,
+    "coinsurancePercent": 100,
+    "serviceCost": 200.00
+  },
+  {
+    "scenario": "ComplexInsuranceMix",
+    "copay": 40.00,
+    "deductible": 200.00,
+    "coinsurancePercent": 60,
+    "serviceCost": 350.00
+  },
+  {
+    "scenario": "SelfPayNoInsurance",
+    "copay": 0.00,
+    "deductible": 0.00,
+    "coinsurancePercent": 0,
+    "serviceCost": 175.00
+  },
+  {
+    "scenario": "CopayExceedsServiceCost",
+    "copay": 200.00,
+    "deductible": 0.00,
+    "coinsurancePercent": 80,
+    "serviceCost": 100.00
+  },
+  {
+    "scenario": "DeductibleExceedsServiceCost",
+    "copay": 25.00,
+    "deductible": 1000.00,
+    "coinsurancePercent": 80,
+    "serviceCost": 150.00
+  },
+  {
+    "scenario": "MinimalCopayFullCoverage",
+    "copay": 10.00,
+    "deductible": 50.00,
+    "coinsurancePercent": 90,
+    "serviceCost": 250.00
+  },
+  {
+    "scenario": "GroupTherapySession",
+    "copay": 15.00,
+    "deductible": 100.00,
+    "coinsurancePercent": 75,
+    "serviceCost": 75.00
+  },
+  {
+    "scenario": "PsychiatricEvaluation",
+    "copay": 50.00,
+    "deductible": 250.00,
+    "coinsurancePercent": 80,
+    "serviceCost": 500.00
+  },
+  {
+    "scenario": "InitialAssessment",
+    "copay": 35.00,
+    "deductible": 150.00,
+    "coinsurancePercent": 70,
+    "serviceCost": 275.00
+  },
+  {
+    "scenario": "ZeroCostScenario",
+    "copay": 0.00,
+    "deductible": 0.00,
+    "coinsurancePercent": 100,
+    "serviceCost": 0.00
+  }
+]

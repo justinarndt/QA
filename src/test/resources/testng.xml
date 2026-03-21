@@ -1,0 +1,42 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="GuardianEHR Master Suite" parallel="methods" thread-count="5">
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- P1: Critical Path — Blocks deployment if failed            -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <test name="Security & RBAC">
+        <groups>
+            <run>
+                <include name="security"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.guardian.tests.RBACSecurityTest"/>
+        </classes>
+    </test>
+
+    <test name="Hybrid Workflow">
+        <classes>
+            <class name="com.guardian.tests.HybridWorkflowTest"/>
+        </classes>
+    </test>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- P2: Billing — Financial accuracy validation                -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <test name="Billing Accuracy">
+        <classes>
+            <class name="com.guardian.tests.BillingDataDrivenTest"/>
+        </classes>
+    </test>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- P3: Resiliency — Chaos / Network failure testing           -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <test name="BiDi Resiliency">
+        <classes>
+            <class name="com.guardian.tests.BiDiChaosTest"/>
+        </classes>
+    </test>
+
+</suite>

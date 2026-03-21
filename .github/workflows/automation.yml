@@ -1,0 +1,106 @@
+# ═══════════════════════════════════════════════════════════════
+#  GuardianEHR — Continuous Test Automation Pipeline
+#  Trigger: Push / PR to main, or manual dispatch
+# ═══════════════════════════════════════════════════════════════
+
+name: GuardianEHR CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  test:
+    name: 🧪 Test Suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      # ── Checkout ────────────────────────────────
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      # ── JDK 21 ──────────────────────────────────
+      - name: ☕ Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      # ── Chrome ───────────────────────────────────
+      - name: 🌐 Install Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      # ── Run Tests (Headless) ─────────────────────
+      - name: 🏃 Run test suite
+        run: |
+          mvn clean test \
+            -Dbrowser=chrome \
+            -Dheadless=true \
+            -Dretry.count=2 \
+            --batch-mode \
+            --fail-at-end
+        continue-on-error: true
+
+      # ── Allure Results ───────────────────────────
+      - name: 📊 Generate Allure report
+        if: always()
+        run: mvn allure:report --batch-mode
+
+      # ── Upload artifacts ─────────────────────────
+      - name: 📦 Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: target/site/allure-maven-plugin/
+          retention-days: 14
+
+      - name: 📦 Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports/
+          retention-days: 14
+
+  # ── Deploy Allure to GitHub Pages ──────────────
+  deploy-report:
+    name: 🚀 Deploy Allure Report
+    needs: test
+    if: github.ref == 'refs/heads/main' && always()
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: 📥 Download report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-report
+          path: ./allure-report
+
+      - name: 📄 Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: 📤 Upload to Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./allure-report
+
+      - name: 🌍 Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

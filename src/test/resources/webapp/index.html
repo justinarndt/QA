@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GuardianEHR — Mock Practice Management System</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --danger: #dc2626;
+            --success: #16a34a;
+            --warning: #f59e0b;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── Shared ────────────────────────────────── */
+        .container { max-width: 960px; margin: 0 auto; padding: 2rem; }
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-danger { background: var(--danger); color: white; }
+
+        input, select {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            margin-top: 0.3rem;
+        }
+        label { font-weight: 600; font-size: 0.85rem; color: var(--text-muted); }
+
+        .hidden { display: none !important; }
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .badge-role { background: #dbeafe; color: #1e40af; }
+        .badge-denied { background: #fef2f2; color: #991b1b; }
+
+        .error-msg {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: var(--danger);
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .success-msg {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: var(--success);
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+        }
+
+        /* ── Layout ────────────────────────────────── */
+        .nav-bar {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav-bar h1 { font-size: 1.2rem; }
+        .nav-links { display: flex; gap: 1rem; }
+        .nav-links button {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .nav-links button:hover { background: rgba(255,255,255,0.3); }
+        .nav-links button.active { background: rgba(255,255,255,0.35); }
+
+        /* ── Views ─────────────────────────────────── */
+        .view { display: none; }
+        .view.active { display: block; }
+
+        .form-group { margin-bottom: 1rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .result-label { color: var(--text-muted); }
+        .result-value { font-weight: 700; font-size: 1.1rem; }
+        .result-value.total { color: var(--primary); font-size: 1.3rem; }
+
+        .note-entry {
+            border-left: 3px solid var(--primary);
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.8rem;
+            background: #f1f5f9;
+            border-radius: 0 8px 8px 0;
+        }
+        .search-result {
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        .patient-name { font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  LOGIN VIEW                                                    -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="loginView" class="view active">
+    <div class="container" style="max-width: 440px; margin-top: 8vh;">
+        <div class="card">
+            <h2 style="text-align:center; margin-bottom:0.3rem;">🛡️ GuardianEHR</h2>
+            <p style="text-align:center; color:var(--text-muted); margin-bottom:1.5rem;">
+                Practice Management System
+            </p>
+
+            <div class="form-group">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" placeholder="admin@clinic.com">
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" placeholder="SecurePass123">
+            </div>
+            <div class="form-group">
+                <label for="loginRole">Role</label>
+                <select id="loginRole">
+                    <option value="admin">Admin</option>
+                    <option value="doctor">Doctor</option>
+                    <option value="billingclerk">Billing Clerk</option>
+                    <option value="intern">Intern</option>
+                    <option value="frontdesk">Front Desk</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" id="loginBtn" style="width:100%" onclick="doLogin()">
+                Sign In
+            </button>
+            <div id="loginError" class="error-msg hidden" style="margin-top:1rem;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  DASHBOARD VIEW                                                -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="dashboardView" class="view">
+    <nav class="nav-bar">
+        <h1>🛡️ GuardianEHR</h1>
+        <div class="nav-links">
+            <button id="navScheduler" onclick="showView('schedulerView')">📅 Scheduler</button>
+            <button id="navBilling" onclick="showView('billingView')">💰 Billing</button>
+            <button id="navClinicalNotes" onclick="showView('notesView')">📋 Clinical Notes</button>
+            <button id="navPatients" onclick="showView('patientsView')">👥 Patients</button>
+            <button id="logoutBtn" onclick="doLogout()" style="background:rgba(220,38,38,0.3)">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="welcomeBanner" class="card">
+            <h2>Welcome back!</h2>
+            <p style="color:var(--text-muted)">Role: <span id="userRoleBadge" class="badge badge-role"></span></p>
+        </div>
+        <div id="accessDenied" class="error-msg hidden">
+            🚫 Access Denied — You do not have permission to view this content.
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  SCHEDULER VIEW                                                -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="schedulerView" class="view">
+    <nav class="nav-bar">
+        <h1>📅 Scheduler</h1>
+        <div class="nav-links">
+            <button onclick="showView('dashboardInner')">← Dashboard</button>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="card">
+            <h3>Search Patients</h3>
+            <div style="display:flex;gap:0.5rem;margin-top:1rem;">
+                <input type="text" id="patientSearch" placeholder="Search by name or ID...">
+                <button class="btn btn-primary" id="searchBtn" onclick="searchPatients()">Search</button>
+            </div>
+            <div id="searchResults" style="margin-top:1rem;"></div>
+            <div id="noResults" class="hidden" style="margin-top:1rem; color:var(--text-muted);">
+                No patients found.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  BILLING VIEW                                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="billingView" class="view">
+    <nav class="nav-bar">
+        <h1>💰 Billing Calculator</h1>
+        <div class="nav-links">
+            <button onclick="showView('dashboardInner')">← Dashboard</button>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="card">
+            <h3>Insurance Billing</h3>
+            <div class="form-row" style="margin-top:1rem;">
+                <div class="form-group">
+                    <label for="serviceCost">Service Cost ($)</label>
+                    <input type="number" id="serviceCost" value="150">
+                </div>
+                <div class="form-group">
+                    <label for="copayAmount">Copay ($)</label>
+                    <input type="number" id="copayAmount" value="25">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="deductibleAmount">Deductible ($)</label>
+                    <input type="number" id="deductibleAmount" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="coinsurancePercent">Co-Insurance (%)</label>
+                    <input type="number" id="coinsurancePercent" value="80">
+                </div>
+            </div>
+            <button class="btn btn-primary" id="calculateBtn" onclick="calculateBilling()" style="width:100%">
+                Calculate
+            </button>
+
+            <div id="billingResults" class="hidden" style="margin-top:1.5rem;">
+                <div class="result-row">
+                    <span class="result-label">Insurance Pays</span>
+                    <span class="result-value" id="insurancePays">$0.00</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Patient Pays</span>
+                    <span class="result-value" id="patientPays">$0.00</span>
+                </div>
+                <div class="result-row" style="border:none;padding-top:1rem;">
+                    <span class="result-label" style="font-size:1.1rem;">Total Due</span>
+                    <span class="result-value total" id="totalDue">$0.00</span>
+                </div>
+            </div>
+            <div id="billingError" class="error-msg hidden" style="margin-top:1rem;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  CLINICAL NOTES VIEW                                           -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="notesView" class="view">
+    <nav class="nav-bar">
+        <h1>📋 Clinical Notes</h1>
+        <div class="nav-links">
+            <button onclick="showView('dashboardInner')">← Dashboard</button>
+        </div>
+    </nav>
+    <div class="container" id="clinicalNotesView">
+        <div id="accessDeniedMessage" class="error-msg hidden" style="margin-bottom:1rem;">
+            🚫 ACCESS DENIED — Your role does not have permission to view clinical notes.
+            This access attempt has been logged for compliance auditing.
+        </div>
+        <div id="notesContent">
+            <div class="card">
+                <h3 id="notesPatientName">Patient: John Doe</h3>
+                <div class="note-entry">
+                    <div class="note-content"><strong>Session Notes — 03/15/2026</strong><br>
+                    Patient reports improved sleep patterns. Continuing current treatment plan.
+                    Discussed coping strategies for workplace stress.</div>
+                </div>
+                <div class="note-entry">
+                    <div class="note-content"><strong>Session Notes — 03/01/2026</strong><br>
+                    Follow-up assessment. PHQ-9 score decreased from 14 to 8.
+                    Medication adjustment recommended.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  PATIENTS VIEW                                                 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="patientsView" class="view">
+    <nav class="nav-bar">
+        <h1>👥 Patients</h1>
+        <div class="nav-links">
+            <button onclick="showView('dashboardInner')">← Dashboard</button>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="card">
+            <h3>Patient Registry</h3>
+            <div id="patientList" style="margin-top:1rem;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  ERROR BANNER (for chaos testing)                              -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="errorBanner" class="hidden" style="
+    position:fixed; top:0; left:0; right:0;
+    background:#dc2626; color:white; text-align:center;
+    padding:1rem; font-weight:700; z-index:9999;
+">
+    ⚠️ Service Unavailable — We're experiencing technical difficulties. Please try again later.
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  APPLICATION STATE
+// ═══════════════════════════════════════════════════════════════
+
+const VALID_CREDENTIALS = {
+    'admin@clinic.com':     { password: 'SecurePass123', role: 'admin' },
+    'doctor@clinic.com':    { password: 'SecurePass123', role: 'doctor' },
+    'billing@clinic.com':   { password: 'SecurePass123', role: 'billingclerk' },
+    'intern@clinic.com':    { password: 'SecurePass123', role: 'intern' },
+    'frontdesk@clinic.com': { password: 'SecurePass123', role: 'frontdesk' }
+};
+
+const ROLE_PERMISSIONS = {
+    admin:        { scheduler: true,  billing: true,  clinicalNotes: true,  patients: true },
+    doctor:       { scheduler: true,  billing: true,  clinicalNotes: true,  patients: true },
+    billingclerk: { scheduler: true,  billing: true,  clinicalNotes: false, patients: true },
+    intern:       { scheduler: true,  billing: false, clinicalNotes: false, patients: true },
+    frontdesk:    { scheduler: true,  billing: false, clinicalNotes: false, patients: false }
+};
+
+let patients = [
+    { id: 'P001', firstName: 'John',  lastName: 'Doe',   dob: '1990-01-15', status: 'active' },
+    { id: 'P002', firstName: 'Jane',  lastName: 'Smith', dob: '1985-07-22', status: 'active' },
+    { id: 'P003', firstName: 'Emily', lastName: 'Chen',  dob: '1978-11-03', status: 'active' }
+];
+
+let currentRole = null;
+
+// ═══════════════════════════════════════════════════════════════
+//  LOGIN
+// ═══════════════════════════════════════════════════════════════
+
+function doLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const roleSelect = document.getElementById('loginRole').value;
+    const errorDiv = document.getElementById('loginError');
+
+    errorDiv.classList.add('hidden');
+
+    const creds = VALID_CREDENTIALS[email];
+    if (!creds || creds.password !== password) {
+        errorDiv.textContent = 'Invalid email or password.';
+        errorDiv.classList.remove('hidden');
+        return;
+    }
+
+    currentRole = roleSelect;
+    applyRBAC(currentRole);
+
+    document.getElementById('userRoleBadge').textContent = currentRole.toUpperCase();
+    document.getElementById('loginView').classList.remove('active');
+    document.getElementById('dashboardView').classList.add('active');
+    renderPatientList();
+}
+
+function doLogout() {
+    currentRole = null;
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('loginView').classList.add('active');
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginPassword').value = '';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RBAC — Role-Based Access Control
+// ═══════════════════════════════════════════════════════════════
+
+function applyRBAC(role) {
+    const perms = ROLE_PERMISSIONS[role] || {};
+
+    toggle('navScheduler',    perms.scheduler);
+    toggle('navBilling',      perms.billing);
+    toggle('navClinicalNotes', perms.clinicalNotes);
+    toggle('navPatients',     perms.patients);
+}
+
+function toggle(id, visible) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.toggle('hidden', !visible);
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+
+function showView(viewId) {
+    if (viewId === 'dashboardInner') {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('dashboardView').classList.add('active');
+        return;
+    }
+
+    // Check RBAC for notes
+    if (viewId === 'notesView') {
+        const perms = ROLE_PERMISSIONS[currentRole];
+        const denied = document.getElementById('accessDeniedMessage');
+        const content = document.getElementById('notesContent');
+        if (!perms || !perms.clinicalNotes) {
+            denied.classList.remove('hidden');
+            content.classList.add('hidden');
+        } else {
+            denied.classList.add('hidden');
+            content.classList.remove('hidden');
+        }
+    }
+
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(viewId).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SCHEDULER — Patient Search
+// ═══════════════════════════════════════════════════════════════
+
+function searchPatients() {
+    const query = document.getElementById('patientSearch').value.toLowerCase();
+    const resultsDiv = document.getElementById('searchResults');
+    const noResults = document.getElementById('noResults');
+
+    const matches = patients.filter(p =>
+        p.firstName.toLowerCase().includes(query) ||
+        p.lastName.toLowerCase().includes(query) ||
+        p.id.toLowerCase().includes(query) ||
+        (p.firstName + ' ' + p.lastName).toLowerCase().includes(query)
+    );
+
+    if (matches.length === 0) {
+        resultsDiv.innerHTML = '';
+        noResults.classList.remove('hidden');
+    } else {
+        noResults.classList.add('hidden');
+        resultsDiv.innerHTML = matches.map(p => `
+            <div class="search-result">
+                <span class="patient-name">${p.firstName} ${p.lastName}</span>
+                <span style="color:var(--text-muted)">${p.id} • DOB: ${p.dob}</span>
+            </div>
+        `).join('');
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  BILLING — Insurance Calculator
+// ═══════════════════════════════════════════════════════════════
+
+function calculateBilling() {
+    const copay       = parseFloat(document.getElementById('copayAmount').value) || 0;
+    const deductible  = parseFloat(document.getElementById('deductibleAmount').value) || 0;
+    const coinsurance = parseFloat(document.getElementById('coinsurancePercent').value) || 0;
+    const serviceCost = parseFloat(document.getElementById('serviceCost').value) || 0;
+
+    const afterDeductible = Math.max(0, serviceCost - deductible);
+    const insurancePays   = afterDeductible * (coinsurance / 100);
+    const patientPays     = copay + (afterDeductible - insurancePays);
+
+    document.getElementById('insurancePays').textContent = insurancePays.toFixed(2);
+    document.getElementById('patientPays').textContent   = patientPays.toFixed(2);
+    document.getElementById('totalDue').textContent      = patientPays.toFixed(2);
+    document.getElementById('billingResults').classList.remove('hidden');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PATIENTS — Registry
+// ═══════════════════════════════════════════════════════════════
+
+function renderPatientList() {
+    const list = document.getElementById('patientList');
+    if (!list) return;
+    list.innerHTML = patients.map(p => `
+        <div class="search-result">
+            <span class="patient-name">${p.firstName} ${p.lastName}</span>
+            <span style="color:var(--text-muted)">${p.id} • ${p.status}</span>
+        </div>
+    `).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MOCK API ENDPOINTS (for RestAssured integration)
+// ═══════════════════════════════════════════════════════════════
+
+// This mock app also exposes a simple API via URL hash routing
+// so the ApiClient can add patients that the UI will pick up.
+window.addEventListener('hashchange', () => {
+    const hash = window.location.hash;
+    if (hash.startsWith('#addPatient:')) {
+        try {
+            const data = JSON.parse(decodeURIComponent(hash.substring(12)));
+            patients.push({
+                id: 'P' + String(patients.length + 1).padStart(3, '0'),
+                firstName: data.firstName,
+                lastName: data.lastName,
+                dob: data.dateOfBirth || '2000-01-01',
+                status: 'active'
+            });
+            renderPatientList();
+        } catch(e) { /* ignore parse errors */ }
+    }
+});
+</script>
+
+</body>
+</html>
