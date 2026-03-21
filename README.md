@@ -10,22 +10,38 @@
 
 ## 📐 Architecture
 
-```
-┌───────────────────────────────────────────────────────┐
-│                    TEST SUITES                         │
-│  HybridWorkflow │ RBAC Security │ Billing │ BiDi Chaos │
-├───────────────────────────────────────────────────────┤
-│                  PAGE OBJECTS (Fluent)                 │
-│  LoginPage │ DashboardPage │ SchedulerPage │ Billing  │
-├───────────────────────────────────────────────────────┤
-│               FRAMEWORK CORE                          │
-│  BaseTest (ThreadLocal + BiDi)  │  ConfigManager      │
-│  ApiClient (RestAssured)        │  RetryAnalyzer       │
-├───────────────────────────────────────────────────────┤
-│               INFRASTRUCTURE                          │
-│  GitHub Actions CI/CD  │  Allure Reporting             │
-│  Parallel Execution    │  Data-Driven Engine           │
-└───────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    subgraph TESTS["🧪 Test Suites"]
+        T1["HybridWorkflowTest"]
+        T2["RBACSecurityTest"]
+        T3["BillingDataDrivenTest"]
+        T4["BiDiChaosTest"]
+    end
+
+    subgraph PAGES["📄 Page Objects — Fluent API"]
+        P1["LoginPage"]
+        P2["DashboardPage"]
+        P3["SchedulerPage"]
+        P4["BillingPage"]
+        P5["PatientNotesPage"]
+    end
+
+    subgraph CORE["⚙️ Framework Core"]
+        C1["BaseTest\nThreadLocal + BiDi"]
+        C2["ConfigManager"]
+        C3["ApiClient\nRestAssured"]
+        C4["RetryAnalyzer"]
+    end
+
+    subgraph INFRA["🏗️ Infrastructure"]
+        I1["GitHub Actions CI/CD"]
+        I2["Allure Reporting"]
+        I3["Parallel Execution"]
+        I4["Data-Driven Engine"]
+    end
+
+    TESTS --> PAGES --> CORE --> INFRA
 ```
 
 ---
