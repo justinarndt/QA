@@ -110,10 +110,10 @@
 
     /* ─── Architecture ─── */
     .arch-pipeline {
-      display: flex; align-items: stretch; gap: 0;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
     }
     .arch-step {
-      flex: 1; padding: 20px; border: 1px solid var(--gray-200);
+      padding: 20px; border: 1px solid var(--gray-200);
       background: var(--gray-50);
       text-align: center;
     }
@@ -217,7 +217,7 @@
 
     /* ─── Responsive ─── */
     @media (max-width: 768px) {
-      .arch-pipeline { flex-direction: column; }
+      .arch-pipeline { grid-template-columns: 1fr; }
       .arch-step { border-radius: 0 !important; }
       .arch-step + .arch-step { border-left: 1px solid var(--gray-200); border-top: none; }
       .decisions-list { grid-template-columns: 1fr; }
