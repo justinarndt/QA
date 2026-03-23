@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GuardianEHR — Healthcare Test Automation Framework</title>
+  <meta name="description" content="Production-grade healthcare test automation framework with Selenium 4 BiDi, RestAssured, TestNG, Allure, and Java 21. Shift-Left quality engineering for behavioral health EHR systems.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #111827;
+      --bg-card: rgba(17, 24, 39, 0.7);
+      --border: rgba(99, 179, 237, 0.12);
+      --accent: #63b3ed;
+      --accent-glow: rgba(99, 179, 237, 0.25);
+      --accent-green: #68d391;
+      --accent-amber: #f6ad55;
+      --accent-rose: #fc8181;
+      --accent-violet: #b794f4;
+      --text-primary: #e2e8f0;
+      --text-secondary: #a0aec0;
+      --text-muted: #718096;
+      --gradient-hero: linear-gradient(135deg, #0a0e17 0%, #1a1f36 50%, #0a0e17 100%);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ─── Animated Background ─── */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(99, 179, 237, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 179, 237, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .bg-glow {
+      position: fixed;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .bg-glow--blue { background: #63b3ed; top: -200px; right: -100px; }
+    .bg-glow--green { background: #68d391; bottom: -200px; left: -100px; }
+
+    /* ─── Container ─── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+    /* ─── Navigation ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      background: rgba(10, 14, 23, 0.8);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+      transition: box-shadow 0.3s;
+    }
+    nav.scrolled { box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3); }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 700; font-size: 1.1rem; color: var(--text-primary);
+      text-decoration: none;
+    }
+    .nav-brand .shield { font-size: 1.4rem; }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a {
+      color: var(--text-secondary); text-decoration: none;
+      font-size: 0.875rem; font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-gh {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--text-secondary); text-decoration: none;
+      font-size: 0.875rem; font-weight: 500;
+      padding: 8px 16px; border-radius: 8px;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    .nav-gh:hover { border-color: var(--accent); color: var(--accent); }
+    .nav-gh svg { width: 18px; height: 18px; fill: currentColor; }
+
+    /* ─── Hero ─── */
+    .hero {
+      padding: 160px 0 100px;
+      text-align: center;
+      background: var(--gradient-hero);
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; border-radius: 999px;
+      background: rgba(99, 179, 237, 0.08);
+      border: 1px solid rgba(99, 179, 237, 0.2);
+      font-size: 0.8rem; font-weight: 500; color: var(--accent);
+      margin-bottom: 28px;
+      animation: fadeDown 0.6s ease-out;
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent-green);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800; letter-spacing: -0.03em;
+      line-height: 1.1; margin-bottom: 20px;
+      animation: fadeDown 0.6s ease-out 0.1s both;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-violet) 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      max-width: 640px; margin: 0 auto 36px;
+      font-size: 1.15rem; color: var(--text-secondary); line-height: 1.7;
+      animation: fadeDown 0.6s ease-out 0.2s both;
+    }
+    .hero-actions {
+      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+      animation: fadeDown 0.6s ease-out 0.3s both;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px; border-radius: 12px;
+      font-size: 0.95rem; font-weight: 600;
+      text-decoration: none; transition: all 0.25s; cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #4299e1);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(99, 179, 237, 0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(99, 179, 237, 0.45);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border); color: var(--text-primary);
+    }
+    .btn-outline:hover {
+      border-color: var(--accent); color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    /* ─── Tech Stack Marquee ─── */
+    .tech-stack {
+      display: flex; gap: 32px; justify-content: center; flex-wrap: wrap;
+      padding: 40px 0; margin-top: 20px;
+      animation: fadeDown 0.6s ease-out 0.4s both;
+    }
+    .tech-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem; font-weight: 500;
+      color: var(--text-muted);
+      padding: 6px 14px; border-radius: 6px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* ─── Section ─── */
+    section { padding: 100px 0; }
+    .section-header { text-align: center; margin-bottom: 60px; }
+    .section-label {
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      font-weight: 700; letter-spacing: -0.02em;
+    }
+
+    /* ─── Architecture ─── */
+    .arch-flow {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0; flex-wrap: wrap; padding: 20px 0;
+    }
+    .arch-node {
+      padding: 20px 28px; border-radius: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      text-align: center;
+      min-width: 180px;
+      transition: all 0.3s;
+    }
+    .arch-node:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 30px var(--accent-glow);
+      transform: translateY(-4px);
+    }
+    .arch-node-icon { font-size: 1.8rem; margin-bottom: 8px; }
+    .arch-node-label { font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }
+    .arch-node-sub { font-size: 0.78rem; color: var(--text-muted); }
+    .arch-arrow {
+      font-size: 1.4rem; color: var(--text-muted); padding: 0 8px;
+      flex-shrink: 0;
+    }
+
+    /* ─── Features Grid ─── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      padding: 32px; border-radius: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      transition: all 0.3s;
+    }
+    .feature-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 40px var(--accent-glow);
+      transform: translateY(-4px);
+    }
+    .feature-icon {
+      width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 12px;
+      font-size: 1.4rem; margin-bottom: 20px;
+    }
+    .feature-icon--blue { background: rgba(99, 179, 237, 0.12); }
+    .feature-icon--green { background: rgba(104, 211, 145, 0.12); }
+    .feature-icon--amber { background: rgba(246, 173, 85, 0.12); }
+    .feature-icon--rose { background: rgba(252, 129, 129, 0.12); }
+    .feature-card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; }
+    .feature-card p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.65; }
+
+    /* ─── Test Suites Table ─── */
+    .suites-table {
+      width: 100%; border-collapse: collapse;
+      border-radius: 16px; overflow: hidden;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+    }
+    .suites-table th {
+      text-align: left; padding: 16px 24px;
+      font-size: 0.78rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--text-muted); background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid var(--border);
+    }
+    .suites-table td {
+      padding: 18px 24px; font-size: 0.9rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--text-secondary);
+    }
+    .suites-table tr:last-child td { border-bottom: none; }
+    .suites-table tr:hover td { background: rgba(99, 179, 237, 0.03); }
+    .suite-name { color: var(--text-primary); font-weight: 600; }
+    .suite-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 6px;
+      font-size: 0.75rem; font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .badge--api { background: rgba(99, 179, 237, 0.12); color: var(--accent); }
+    .badge--rbac { background: rgba(104, 211, 145, 0.12); color: var(--accent-green); }
+    .badge--ddt { background: rgba(246, 173, 85, 0.12); color: var(--accent-amber); }
+    .badge--chaos { background: rgba(252, 129, 129, 0.12); color: var(--accent-rose); }
+
+    /* ─── Quick Start ─── */
+    .quickstart {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .qs-tabs {
+      display: flex; border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+    .qs-tab {
+      padding: 14px 24px; font-size: 0.85rem; font-weight: 500;
+      color: var(--text-muted); cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s; background: none; border-top: none;
+      border-left: none; border-right: none;
+    }
+    .qs-tab:hover { color: var(--text-secondary); }
+    .qs-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .qs-panel { display: none; padding: 28px; }
+    .qs-panel.active { display: block; }
+    .qs-code {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 20px 24px; margin: 12px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem; line-height: 1.8;
+      color: var(--text-secondary);
+      overflow-x: auto;
+    }
+    .qs-code .comment { color: var(--text-muted); }
+    .qs-code .cmd { color: var(--accent-green); }
+    .qs-code .flag { color: var(--accent-amber); }
+
+    /* ─── Decisions Table ─── */
+    .decisions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+    .decision {
+      padding: 24px; border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      transition: border-color 0.2s;
+    }
+    .decision:hover { border-color: rgba(99, 179, 237, 0.3); }
+    .decision-key {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem; font-weight: 500;
+      color: var(--accent); margin-bottom: 8px;
+    }
+    .decision-val { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; }
+
+    /* ─── Footer ─── */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    footer p { font-size: 0.85rem; color: var(--text-muted); }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ─── Animations ─── */
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { opacity: 0; transform: translateY(20px); transition: all 0.6s ease-out; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .arch-flow { flex-direction: column; gap: 12px; }
+      .arch-arrow { transform: rotate(90deg); }
+      .suites-table { font-size: 0.82rem; }
+      .suites-table th, .suites-table td { padding: 12px 16px; }
+      .qs-tabs { overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow--blue"></div>
+  <div class="bg-glow bg-glow--green"></div>
+
+  <!-- ─── Nav ─── -->
+  <nav id="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-brand">
+        <span class="shield">🛡️</span> GuardianEHR
+      </a>
+      <ul class="nav-links">
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#suites">Test Suites</a></li>
+        <li><a href="#quickstart">Quick Start</a></li>
+        <li><a href="#decisions">Decisions</a></li>
+      </ul>
+      <a href="https://github.com/justinarndt/QA" class="nav-gh" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        Source
+      </a>
+    </div>
+  </nav>
+
+  <!-- ─── Hero ─── -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge"><span class="dot"></span> Java 21 · Selenium 4 BiDi · TestNG</div>
+      <h1>
+        <span class="gradient">GuardianEHR</span><br>
+        Healthcare Automation Framework
+      </h1>
+      <p>
+        Production-grade test automation for behavioral health EHR systems.
+        Shift-Left quality engineering, HIPAA-aligned RBAC testing,
+        and Selenium 4 BiDi chaos engineering — all in one framework.
+      </p>
+      <div class="hero-actions">
+        <a href="https://github.com/justinarndt/QA" class="btn btn-primary" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          View on GitHub
+        </a>
+        <a href="#quickstart" class="btn btn-outline">Quick Start →</a>
+      </div>
+      <div class="tech-stack">
+        <span class="tech-tag">Selenium 4 BiDi</span>
+        <span class="tech-tag">RestAssured</span>
+        <span class="tech-tag">TestNG</span>
+        <span class="tech-tag">Allure Reports</span>
+        <span class="tech-tag">Java 21</span>
+        <span class="tech-tag">Maven</span>
+        <span class="tech-tag">GitHub Actions</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Architecture ─── -->
+  <section id="architecture">
+    <div class="container">
+      <div class="section-header fade-in">
+        <div class="section-label">Architecture</div>
+        <h2 class="section-title">Layered Test Framework Design</h2>
+      </div>
+      <div class="arch-flow fade-in">
+        <div class="arch-node">
+          <div class="arch-node-icon">🧪</div>
+          <div class="arch-node-label">Test Suites</div>
+          <div class="arch-node-sub">Hybrid · RBAC · DDT · Chaos</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node">
+          <div class="arch-node-icon">📄</div>
+          <div class="arch-node-label">Page Objects</div>
+          <div class="arch-node-sub">Login · Dashboard · Scheduler · Billing · Notes</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node">
+          <div class="arch-node-icon">⚙️</div>
+          <div class="arch-node-label">Framework Core</div>
+          <div class="arch-node-sub">BaseTest · ConfigManager · ApiClient · Retry</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node">
+          <div class="arch-node-icon">🚀</div>
+          <div class="arch-node-label">Infrastructure</div>
+          <div class="arch-node-sub">GitHub Actions · Allure · Parallel Exec</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Features ─── -->
+  <section id="features" style="background: rgba(255,255,255,0.01);">
+    <div class="container">
+      <div class="section-header fade-in">
+        <div class="section-label">Design Philosophy</div>
+        <h2 class="section-title">Purpose-Built for Healthcare QA</h2>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card fade-in">
+          <div class="feature-icon feature-icon--blue">⚡</div>
+          <h3>Shift-Left Testing</h3>
+          <p>RestAssured API calls seed patient records and appointments, then Selenium validates the UI layer. 10–100× faster than UI-based setup with zero fragility.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <div class="feature-icon feature-icon--green">🔒</div>
+          <h3>RBAC Security Testing</h3>
+          <p>Data-driven parameterization across Admin, Doctor, Billing Clerk, Intern, and Front Desk roles. Every permission validated against a centralized roles.json matrix.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <div class="feature-icon feature-icon--amber">🌐</div>
+          <h3>BiDi Network Interception</h3>
+          <p>Selenium 4 Bidirectional Protocol monitors all network requests during execution. Catches silent API failures — critical in healthcare where unlogged data loss violates HIPAA.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <div class="feature-icon feature-icon--rose">💥</div>
+          <h3>Chaos Engineering</h3>
+          <p>BiDiChaosTest injects network failures during active sessions to verify graceful error handling, zero silent data loss, and clean JavaScript console output.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Test Suites ─── -->
+  <section id="suites">
+    <div class="container">
+      <div class="section-header fade-in">
+        <div class="section-label">Test Coverage</div>
+        <h2 class="section-title">Four Targeted Test Suites</h2>
+      </div>
+      <div class="fade-in" style="overflow-x: auto;">
+        <table class="suites-table">
+          <thead>
+            <tr>
+              <th>Suite</th>
+              <th>Strategy</th>
+              <th>What It Proves</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="suite-name">HybridWorkflowTest</span> <span class="suite-badge badge--api">API+UI</span></td>
+              <td>API seed → UI verify</td>
+              <td>Shift-Left efficiency; API/UI integration integrity</td>
+            </tr>
+            <tr>
+              <td><span class="suite-name">RBACSecurityTest</span> <span class="suite-badge badge--rbac">RBAC</span></td>
+              <td>Data-driven role matrix</td>
+              <td>HIPAA access control enforcement across all roles</td>
+            </tr>
+            <tr>
+              <td><span class="suite-name">BillingDataDrivenTest</span> <span class="suite-badge badge--ddt">DDT</span></td>
+              <td>JSON parameter injection</td>
+              <td>Financial calculation accuracy (12 insurance scenarios)</td>
+            </tr>
+            <tr>
+              <td><span class="suite-name">BiDiChaosTest</span> <span class="suite-badge badge--chaos">CHAOS</span></td>
+              <td>Network fault injection</td>
+              <td>Application resiliency under adverse conditions</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Quick Start ─── -->
+  <section id="quickstart" style="background: rgba(255,255,255,0.01);">
+    <div class="container">
+      <div class="section-header fade-in">
+        <div class="section-label">Getting Started</div>
+        <h2 class="section-title">Up and Running in Minutes</h2>
+      </div>
+      <div class="quickstart fade-in">
+        <div class="qs-tabs">
+          <button class="qs-tab active" data-tab="run">Run Tests</button>
+          <button class="qs-tab" data-tab="report">Allure Report</button>
+          <button class="qs-tab" data-tab="ci">CI/CD</button>
+        </div>
+        <div class="qs-panel active" data-panel="run">
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 16px;">
+            <strong>Prerequisites:</strong> Java 21 (Eclipse Temurin), Maven 3.9+, Chrome (latest stable)
+          </p>
+          <div class="qs-code">
+            <span class="comment"># Full suite (visible browser)</span><br>
+            <span class="cmd">mvn clean test</span><br><br>
+            <span class="comment"># CI mode (headless)</span><br>
+            <span class="cmd">mvn clean test</span> <span class="flag">-Dheadless=true</span><br><br>
+            <span class="comment"># Specific suite only</span><br>
+            <span class="cmd">mvn clean test</span> <span class="flag">-Dtest=RBACSecurityTest</span><br><br>
+            <span class="comment"># Override browser</span><br>
+            <span class="cmd">mvn clean test</span> <span class="flag">-Dbrowser=firefox</span>
+          </div>
+        </div>
+        <div class="qs-panel" data-panel="report">
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 16px;">
+            Generate rich Allure Reports with test timelines, screenshots on failure, and step-by-step traceability.
+          </p>
+          <div class="qs-code">
+            <span class="comment"># Open report in browser</span><br>
+            <span class="cmd">mvn allure:serve</span><br><br>
+            <span class="comment"># Generate to target/site/</span><br>
+            <span class="cmd">mvn allure:report</span>
+          </div>
+        </div>
+        <div class="qs-panel" data-panel="ci">
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 16px;">
+            GitHub Actions pipeline runs automatically on every push to <code style="color: var(--accent);">main</code>/<code style="color: var(--accent);">develop</code>:
+          </p>
+          <div class="qs-code">
+            <span class="comment"># Pipeline stages:</span><br>
+            <span class="flag">1. Provision</span> — JDK 21 + Chrome<br>
+            <span class="flag">2. Execute</span>&nbsp; — Full test suite in headless Chrome<br>
+            <span class="flag">3. Report</span>&nbsp; — Allure report generated &amp; uploaded<br>
+            <span class="flag">4. Deploy</span>&nbsp; — Report published to GitHub Pages
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Engineering Decisions ─── -->
+  <section id="decisions">
+    <div class="container">
+      <div class="section-header fade-in">
+        <div class="section-label">Engineering</div>
+        <h2 class="section-title">Key Design Decisions</h2>
+      </div>
+      <div class="decisions-grid">
+        <div class="decision fade-in">
+          <div class="decision-key">ThreadLocal&lt;WebDriver&gt;</div>
+          <div class="decision-val">Thread-safe parallel execution without test interference</div>
+        </div>
+        <div class="decision fade-in">
+          <div class="decision-key">BiDi over CDP</div>
+          <div class="decision-val">Future-proof W3C standard vs. deprecated Chrome DevTools Protocol</div>
+        </div>
+        <div class="decision fade-in">
+          <div class="decision-key">RestAssured for test data</div>
+          <div class="decision-val">10–100× faster than UI-based setup; decouples data seeding from UI state</div>
+        </div>
+        <div class="decision fade-in">
+          <div class="decision-key">JSON data files</div>
+          <div class="decision-val">Readable by QA, editable without code changes, version-controlled</div>
+        </div>
+        <div class="decision fade-in">
+          <div class="decision-key">SoftAssert in RBAC</div>
+          <div class="decision-val">Captures ALL permission violations per role vs. failing on first</div>
+        </div>
+        <div class="decision fade-in">
+          <div class="decision-key">Mock webapp included</div>
+          <div class="decision-val">Framework is fully self-contained; no external dependencies needed</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Footer ─── -->
+  <footer>
+    <div class="container">
+      <p>
+        Built by <a href="https://github.com/justinarndt" target="_blank" rel="noopener">Justin Arndt</a>
+        · <a href="https://github.com/justinarndt/QA" target="_blank" rel="noopener">View Source</a>
+        · MIT License
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // ─── Scroll: nav shadow ───
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    // ─── Tabs ───
+    document.querySelectorAll('.qs-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.qs-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.qs-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelector(`[data-panel="${tab.dataset.tab}"]`).classList.add('active');
+      });
+    });
+
+    // ─── Intersection Observer for fade-in ───
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
