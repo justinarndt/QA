@@ -58,6 +58,10 @@ jobs:
         if: always()
         run: mvn allure:report --batch-mode
 
+      - name: 📄 Create index.html for GitHub Pages
+        if: always()
+        run: cp target/site/allure-maven-plugin/allure-maven.html target/site/allure-maven-plugin/index.html
+
       # ── Upload artifacts ─────────────────────────
       - name: 📦 Upload Allure report
         if: always()
